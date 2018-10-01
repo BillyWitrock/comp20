@@ -1,0 +1,42 @@
+/* responsive.css */
+
+
+@media screen and (max-width: 600px){
+        .software {
+                width:  485px;
+                height: 635px;
+                background: url(software.png) -720px -580px;
+        }
+}
+
+@media screen and (min-width: 600px) and (max-width: 800px){
+        .software {
+                width:  720px;
+                height: 635px;
+                background: url(software.png) 0px -580px;
+        }
+}
+
+@media screen and (min-width: 800px) and (max-width: 1000px){
+        .software {
+                width:  345px;
+                height: 580px;
+                background: url(software.png) -860px 0px;
+        }
+}
+
+@media screen and (min-width: 1000px) and (max-width: 1200px){
+        .software {
+                width:  410px;
+                height: 580px;
+                background: url(software.png) -450px 0px;
+        }
+}
+
+@media screen and (min-width: 1200px){
+        .software {
+                width:  450px;
+                height: 580px;
+                background: url(software.png) 0 0px;
+        }
+}
