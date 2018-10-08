@@ -16,10 +16,21 @@
 <video src="https://www.cs.tufts.edu/comp/20/wedo.mp4" id="wedo" controls></video>
 <div id="lyrics"></div>
 
-<script>
+<script type="text/javascript">
 
+        var video = document.getElementById("wedo");
+        var lyrics = document.getElementById("lyrics")
 
-	// Complete this section and create a CSS file named style.css
+        video.addEventListener("timeupdate", function(){
+                var time = video.currentTime;
+                if (time < 5) {
+                        lyrics.innerHTML = "<h1>Hello</h1>";
+                }
+                else {
+                        lyrics.innerHTML = "<h2>Rest</h2>";
+                }
+
+        })
 
 </script>
 </body>
