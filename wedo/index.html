@@ -23,12 +23,49 @@
 
         video.addEventListener("timeupdate", function(){
                 var time = video.currentTime;
-                if (time < 5) {
-                        lyrics.innerHTML = "<h1>Hello</h1>";
+                if (time > 45.3){
+                        lyrics.innerHTML = "";
+                }
+                else if (time > 38){
+                        lyrics.innerHTML = "<h1>We do, we do!</h1>";
+                }
+                else if (time > 35.8){
+                        lyrics.innerHTML = "<h2>Who rigs every Oscar night?</h2>"
+                }
+                else if (time > 33.6){
+                        lyrics.innerHTML = "<h2>Who robs cavefish of their sight?</h2>"
+                }
+                else if (time > 29.5){
+                        lyrics.innerHTML = "<h1>We do, we do!</h1>";
+                }
+                else if (time > 25){
+                        lyrics.innerHTML = "<h2>Who makes Steve Guttenberg a star?</h2>";
+                }
+                else if (time > 21){
+                        lyrics.innerHTML = "<h2>Who holds back the electric car?</h2>";
+                }
+                else if (time > 16.7){
+                        lyrics.innerHTML = "<h1>We do, we do!</h1>";
+                }
+                else if (time > 14.7){
+                        lyrics.innerHTML = "<h2>Who keeps the Martians under wraps?</h2>";
+                }
+                else if (time > 12.5){
+                        lyrics.innerHTML = "<h2>Who keeps Atlantis off the maps?</h2>";
+                }
+                else if (time > 8){
+                        lyrics.innerHTML = "<h1>We do, we do!</h1>";
+                }
+                else if (time > 6){
+                        lyrics.innerHTML = "<h2>Who keeps the metric system down</h2>";
+                }
+                else if (time > 4) {
+                        lyrics.innerHTML = "<h2>Who controls the British crown</h2>";
                 }
                 else {
-                        lyrics.innerHTML = "<h2>Rest</h2>";
+                        lyrics.innerHTML = "";
                 }
+
 
         })
 
