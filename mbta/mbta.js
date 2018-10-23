@@ -30,7 +30,7 @@ function initMap() {
 
   // create lines
   var lines = [];
-  for(i = 0; i < Stations.length - 1; i++){
+  for(var i = 0; i < Stations.length - 1; i++){
           var line_path = [{lat: Stations[i].lat,   lng: Stations[i].lng},
                            {lat: Stations[i+1].lat, lng: Stations[i+1].lng}];
           line = new google.maps.Polyline({
@@ -76,7 +76,8 @@ function update_infowindow(station,infowindow){
         var arrivals = ["<ul>", "<ul>"];
 
         var schedule = data[station.id].data.data;
-        for (i = 0; i < schedule.length; i++){
+        if (schedule == undefined){content_string == "Error"} else {
+        for (var i = 0; i < schedule.length; i++){
                 var info = schedule[i].attributes;
                 if (info.arrival_time != null){
                         arrivals[info.direction_id] +=
@@ -93,6 +94,7 @@ function update_infowindow(station,infowindow){
         alewife += '<h4>Arrivals</h4>' + arrivals[1] + '</ul>' +
                    '<h4>Departures</h4>' + departures[1] + '</ul>';
         content_string += Braintree + alewife;
+        }
         infowindow.setContent(content_string);
 }
 
@@ -101,13 +103,12 @@ function time_format(date_string){
         var hour = date.getHours();
         var min  = date.getMinutes();
         var day  = date.getDay();
-        var AmPm = "am";
-        if (hour > 12){
-                AmPm = "pm";
+        var AmPm = " am";
+        if (hour >= 12){
+                AmPm = " pm";
                 hour -= 12;
         }
-        if (hour == 0){hour = "12";}
-        var time = hour + ":" + ((min < 10) ? "0" + min: min) + AmPm;
+        var time = ((hour == 0) ? hour = "12":hour) + ":" + ((min < 10) ? "0" + min: min) + AmPm;
         return time;
 }
 
@@ -119,6 +120,7 @@ function get_data(station,infowindow){
         request.onreadystatechange = function(){
                 //want to parse data, update data object.
                 if (request.readyState == 4 && request.status == 200){
+                        console.log(request.responseText);
                         cur_data = JSON.parse(request.responseText);
                         data[station.id] = {data:cur_data, last_update:new Date()};
                         update_infowindow(station,infowindow);
@@ -162,7 +164,7 @@ if (navigator.geolocation){
 function calc_closest_station(pos){
         var Alewife = new google.maps.LatLng(Stations[0].lat,Stations[0].lng);
         var closest_station = {index: 0, distance: google.maps.geometry.spherical.computeDistanceBetween(pos,Alewife)};
-        for (i = 0; i < Stations.length; i++){
+        for (var i = 0; i < Stations.length; i++){
                 var new_place = new google.maps.LatLng(Stations[i].lat,Stations[i].lng);
                 var new_distance = google.maps.geometry.spherical.computeDistanceBetween(pos,new_place);
                 if (new_distance < closest_station.distance){
