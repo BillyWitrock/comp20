@@ -110,7 +110,7 @@ function time_format(date_string){
                 hour -= 12;
         }
         var time = ((hour == 0) ? hour = "12":hour) + ":" + ((min < 10) ? "0" + min: min) + AmPm;
-        return time;
+        return ((hour < 10) ? " " + time : time);
 }
 
 
