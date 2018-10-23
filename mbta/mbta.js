@@ -76,7 +76,7 @@ function update_infowindow(station,infowindow){
         var arrivals = ["<ul>", "<ul>"];
 
         var schedule = data[station.id].data.data;
-        if (schedule == undefined){content_string == "Error"} else {
+        if (schedule == undefined){content_string += "<p>Schedule Unavailable</p>"} else{
         for (var i = 0; i < schedule.length; i++){
                 var info = schedule[i].attributes;
                 if (info.arrival_time != null){
@@ -89,10 +89,11 @@ function update_infowindow(station,infowindow){
                 }
         }
 
-        Braintree += '<h4>Arrivals</h4>' + arrivals[0] + '</ul>' +
-                     '<h4>Departures</h4>' + departures[0] + '</ul>';
-        alewife += '<h4>Arrivals</h4>' + arrivals[1] + '</ul>' +
-                   '<h4>Departures</h4>' + departures[1] + '</ul>';
+        Braintree += ((station.name == "Alewife") ? '':'<h4>Arrivals</h4>' + arrivals[0] + '</ul>') +
+                     ((station.name == "Braintree" || station.name == "Ashmont") ? '':'<h4>Departures</h4>' + departures[0] + '</ul>');
+        alewife += ((station.name == "Braintree" || station.name == "Ashmont") ? '' :
+                '<h4>Arrivals</h4>' + arrivals[1] + '</ul>') +
+                  ((station.name == "Alewife") ? '' : '<h4>Departures</h4>' + departures[1] + '</ul>');
         content_string += Braintree + alewife;
         }
         infowindow.setContent(content_string);
@@ -120,7 +121,6 @@ function get_data(station,infowindow){
         request.onreadystatechange = function(){
                 //want to parse data, update data object.
                 if (request.readyState == 4 && request.status == 200){
-                        console.log(request.responseText);
                         cur_data = JSON.parse(request.responseText);
                         data[station.id] = {data:cur_data, last_update:new Date()};
                         update_infowindow(station,infowindow);
@@ -141,7 +141,7 @@ if (navigator.geolocation){
                 var content_info = "<h1>Current Location</h1>" +
                         "<h4>The closest_station is " +
                         Stations[closest_station.index].name +
-                        "</h4><h4>It is " + closest_station.distance/1609.344 +
+                        "</h4><h4>It is " + (closest_station.distance/1609.344).toFixed(2) +
                         " miles away.</h4>";
                         person.addListener('click', function(){
                                 var infowindow = new google.maps.InfoWindow({
