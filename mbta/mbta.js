@@ -59,9 +59,6 @@ function initMap() {
 function changeMarkerData(station, infowindow){
         var cur_time = new Date();
         var previous_time = data[station.id].last_update;
-        console.log("previous time: " + previous_time);
-        console.log("current time: " + cur_time);
-        console.log("diff: " + (cur_time - previous_time));
         if (previous_time != undefined && (cur_time - previous_time) <= 60000){
                 update_infowindow(station, infowindow);
         }
@@ -71,18 +68,31 @@ function changeMarkerData(station, infowindow){
 }
 
 function update_infowindow(station,infowindow){
-        console.log("update_infowindow")
         var content_string = "<h1>" + station.name + "</h1>";
+        var alewife = '<h3>To Alewife</h3>';
+        var Braintree = '<h3>To Braintree/Ashmont</h3>';
+        // slot 0 = to ashmont; 1 = to alewife
+        var departures = ["<ul>", "<ul>"];
+        var arrivals = ["<ul>", "<ul>"];
+
         var schedule = data[station.id].data.data;
-        var arrival_string = "<h3>Upcoming arrivals</h3><ul>";
-        var depart_string = "<h3>Upcoming departures</h3><ul>";
         for (i = 0; i < schedule.length; i++){
-                arrival_string += "<li>" + time_format(schedule[i].attributes.arrival_time) + "</li>";
-                depart_string += "<li>" + time_format(schedule[i].attributes.departure_time) + "</li>";
+                var info = schedule[i].attributes;
+                if (info.arrival_time != null){
+                        arrivals[info.direction_id] +=
+                                "<li>" + time_format(info.arrival_time) + "</li>";
+                }
+                if (info.departure_time != null){
+                        departures[info.direction_id] +=
+                                "<li>" + time_format(info.departure_time) + "</li>";
+                }
         }
-        arrival_string += "</ul>";
-        depart_string += "</ul>";
-        content_string += arrival_string + depart_string;
+
+        Braintree += '<h4>Arrivals</h4>' + arrivals[0] + '</ul>' +
+                     '<h4>Departures</h4>' + departures[0] + '</ul>';
+        alewife += '<h4>Arrivals</h4>' + arrivals[1] + '</ul>' +
+                   '<h4>Departures</h4>' + departures[1] + '</ul>';
+        content_string += Braintree + alewife;
         infowindow.setContent(content_string);
 }
 
@@ -109,7 +119,7 @@ function get_data(station,infowindow){
         request.onreadystatechange = function(){
                 //want to parse data, update data object.
                 if (request.readyState == 4 && request.status == 200){
-                        console.log("got data");
+                        console.log(request.responseText);
                         cur_data = JSON.parse(request.responseText);
                         data[station.id] = {data:cur_data, last_update:new Date()};
                         update_infowindow(station,infowindow);
