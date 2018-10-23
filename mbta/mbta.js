@@ -59,7 +59,10 @@ function initMap() {
 function changeMarkerData(station, infowindow){
         var cur_time = new Date();
         var previous_time = data[station.id].last_update;
-        if (previous_time != undefined && previous_time - cur_time <= 60000){
+        console.log("previous time: " + previous_time);
+        console.log("current time: " + cur_time);
+        console.log("diff: " + (cur_time - previous_time));
+        if (previous_time != undefined && (cur_time - previous_time) <= 60000){
                 update_infowindow(station, infowindow);
         }
         else {
@@ -74,14 +77,30 @@ function update_infowindow(station,infowindow){
         var arrival_string = "<h3>Upcoming arrivals</h3><ul>";
         var depart_string = "<h3>Upcoming departures</h3><ul>";
         for (i = 0; i < schedule.length; i++){
-                arrival_string += "<li>" + schedule[i].attributes.arrival_time + "</li>";
-                depart_string += "<li>" + schedule[i].attributes.departure_time + "</li>";
+                arrival_string += "<li>" + time_format(schedule[i].attributes.arrival_time) + "</li>";
+                depart_string += "<li>" + time_format(schedule[i].attributes.departure_time) + "</li>";
         }
         arrival_string += "</ul>";
         depart_string += "</ul>";
         content_string += arrival_string + depart_string;
         infowindow.setContent(content_string);
 }
+
+function time_format(date_string){
+        var date = new Date(date_string);
+        var hour = date.getHours();
+        var min  = date.getMinutes();
+        var day  = date.getDay();
+        var AmPm = "am";
+        if (hour > 12){
+                AmPm = "pm";
+                hour -= 12;
+        }
+        if (hour == 0){hour = "12";}
+        var time = hour + ":" + ((min < 10) ? "0" + min: min) + AmPm;
+        return time;
+}
+
 
 function get_data(station,infowindow){
         var request = new XMLHttpRequest();
@@ -91,7 +110,6 @@ function get_data(station,infowindow){
                 //want to parse data, update data object.
                 if (request.readyState == 4 && request.status == 200){
                         console.log("got data");
-                        console.log(request.responseText);
                         cur_data = JSON.parse(request.responseText);
                         data[station.id] = {data:cur_data, last_update:new Date()};
                         update_infowindow(station,infowindow);
@@ -148,7 +166,7 @@ function calc_closest_station(pos){
 
 var data = {"place-alfcl": {data:undefined, last_update:undefined},
             "place-davis": {data:undefined, last_update:undefined},
-            "place-porter":{data:undefined, last_update:undefined},
+            "place-portr":{data:undefined, last_update:undefined},
             "place-harsq": {data:undefined, last_update:undefined},
             "place-cntsq": {data:undefined, last_update:undefined},
             "place-knncl": {data:undefined, last_update:undefined},
@@ -172,7 +190,7 @@ var data = {"place-alfcl": {data:undefined, last_update:undefined},
 var Stations = [
         {name:"Alewife",          lat:  42.395428,  lng: -71.142483,        id:"place-alfcl"},
         {name:"Davis",            lat:   42.39674,  lng: -71.121815,        id:"place-davis"},
-        {name:"Porter Square",    lat:42.3884,      lng:-71.11914899999999, id:"place-porter"},
+        {name:"Porter Square",    lat:42.3884,      lng:-71.11914899999999, id:"place-portr"},
         {name:"Harvard Square",   lat:  42.373362,  lng: -71.118956,        id:"place-harsq"},
         {name:"Central Square",   lat:  42.365486,  lng: -71.103802,        id:"place-cntsq"},
         {name:"Kendall/MIT",      lat:42.36249079,  lng: -71.08617653,      id:"place-knncl"},
