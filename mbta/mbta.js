@@ -1,4 +1,4 @@
-
+var map;
 
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
@@ -11,12 +11,20 @@ function initMap() {
           origin: new google.maps.Point(0,0),
           anchor: new google.maps.Point(25,50)
   };
+  // init infowindow
+  var infowindow = new google.maps.InfoWindow({
+          content: ""
+  });
   // init markers
   Stations.map(function(station){
           var marker = new google.maps.Marker({
                   position: {lat: station.lat, lng: station.lng},
                   map: map,
                   icon: icon
+          });
+          marker.addListener('click', function(){
+                  changeMarkerData(station, infowindow);
+                  infowindow.open(map,marker);
           });
   })
 
@@ -46,6 +54,70 @@ function initMap() {
   // add lines to map
   lines.map(function(line){line.setMap(map)});
 }
+
+
+navigator.geolocation.getCurrentPosition(function(pos){
+        var newCenter = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+        var person = new google.maps.Marker({
+                position: newCenter,
+                map: map,
+        });
+        var closest_station = calc_closest_station(newCenter);
+        var content_info = "<h1>Current Location</h1>" +
+                 "<h4>The closest_station is " +
+                 Stations[closest_station.index].name +
+                 "</h4><h4>It is " + closest_station.distance/1609.344 +
+                 " miles away.</h4>";
+        person.addListener('click', function(){
+                var infowindow = new google.maps.InfoWindow({
+                        content: content_info
+                });
+                infowindow.open(map,person);
+        });
+        var to_nearest = new google.maps.Polyline({
+                path: [newCenter, {lat:Stations[closest_station.index].lat,lng:Stations[closest_station.index].lng}],
+                geodesic: true,
+                strokeColor: 'red',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+        });
+        to_nearest.setMap(map);
+        map.panTo(newCenter);
+});
+
+function calc_closest_station(pos){
+        var Alewife = new google.maps.LatLng(Stations[0].lat,Stations[0].lng);
+        var closest_station = {index: 0, distance: google.maps.geometry.spherical.computeDistanceBetween(pos,Alewife)};
+        for (i = 0; i < Stations.length; i++){
+                var new_place = new google.maps.LatLng(Stations[i].lat,Stations[i].lng);
+                var new_distance = google.maps.geometry.spherical.computeDistanceBetween(pos,new_place);
+                if (new_distance < closest_station.distance){
+                        closest_station.index = i;
+                        closest_station.distance = new_distance;
+                }
+        }
+        return closest_station;
+}
+
+var data;
+var previous_time = undefined;
+function changeMarkerData(station, infowindow){
+        var cur_time = new Date();
+        if (previous_time == undefined){
+                get_data();
+        }
+        // updates every click if previous click was over a min ago
+        else if(previous_time - cur_time >= 60000){
+                get_data();
+        }
+        previous_time = cur_time;
+
+}
+
+function get_data(){
+
+}
+
 var Stations = [
         {name:"Alewife",          lat:  42.395428,  lng: -71.142483,        id:"place-alfcl"},
         {name:"Davis",            lat:   42.39674,  lng: -71.121815,        id:"place-davis"},
