@@ -69,7 +69,18 @@ function changeMarkerData(station, infowindow){
 
 function update_infowindow(station,infowindow){
         console.log("update_infowindow")
-        infowindow.setContent("<p>" + data[station.id].data[0] + "</p>");
+        var content_string = "<h1>" + station.name + "</h1>";
+        var schedule = data[station.id].data.data;
+        var arrival_string = "<h3>Upcoming arrivals</h3><ul>";
+        var depart_string = "<h3>Upcoming departures</h3><ul>";
+        for (i = 0; i < schedule.length; i++){
+                arrival_string += "<li>" + schedule[i].attributes.arrival_time + "</li>";
+                depart_string += "<li>" + schedule[i].attributes.departure_time + "</li>";
+        }
+        arrival_string += "</ul>";
+        depart_string += "</ul>";
+        content_string += arrival_string + depart_string;
+        infowindow.setContent(content_string);
 }
 
 function get_data(station,infowindow){
@@ -80,6 +91,7 @@ function get_data(station,infowindow){
                 //want to parse data, update data object.
                 if (request.readyState == 4 && request.status == 200){
                         console.log("got data");
+                        console.log(request.responseText);
                         cur_data = JSON.parse(request.responseText);
                         data[station.id] = {data:cur_data, last_update:new Date()};
                         update_infowindow(station,infowindow);
