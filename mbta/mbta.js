@@ -56,34 +56,69 @@ function initMap() {
 }
 
 
-navigator.geolocation.getCurrentPosition(function(pos){
-        var newCenter = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-        var person = new google.maps.Marker({
-                position: newCenter,
-                map: map,
-        });
-        var closest_station = calc_closest_station(newCenter);
-        var content_info = "<h1>Current Location</h1>" +
-                 "<h4>The closest_station is " +
-                 Stations[closest_station.index].name +
-                 "</h4><h4>It is " + closest_station.distance/1609.344 +
-                 " miles away.</h4>";
-        person.addListener('click', function(){
-                var infowindow = new google.maps.InfoWindow({
-                        content: content_info
+function changeMarkerData(station, infowindow){
+        var cur_time = new Date();
+        var previous_time = data[station.id].last_update;
+        if (previous_time != undefined && previous_time - cur_time <= 60000){
+                update_infowindow(station, infowindow);
+        }
+        else {
+                get_data(station,infowindow);
+        }
+}
+
+function update_infowindow(station,infowindow){
+        console.log("update_infowindow")
+        infowindow.setContent("<p>" + data[station.id].data[0] + "</p>");
+}
+
+function get_data(station,infowindow){
+        var request = new XMLHttpRequest();
+        var url = "https://chicken-of-the-sea.herokuapp.com/redline/schedule.json?stop_id=" + station.id;
+        request.open("GET", url);
+        request.onreadystatechange = function(){
+                //want to parse data, update data object.
+                if (request.readyState == 4 && request.status == 200){
+                        console.log("got data");
+                        cur_data = JSON.parse(request.responseText);
+                        data[station.id] = {data:cur_data, last_update:new Date()};
+                        update_infowindow(station,infowindow);
+                }
+        };
+        request.send();
+}
+
+// current location
+if (navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(function(pos){
+                var newCenter = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+                var person = new google.maps.Marker({
+                        position: newCenter,
+                        map: map,
                 });
-                infowindow.open(map,person);
-        });
-        var to_nearest = new google.maps.Polyline({
-                path: [newCenter, {lat:Stations[closest_station.index].lat,lng:Stations[closest_station.index].lng}],
-                geodesic: true,
-                strokeColor: 'red',
-                strokeOpacity: 1.0,
-                strokeWeight: 2
-        });
-        to_nearest.setMap(map);
-        map.panTo(newCenter);
-});
+                var closest_station = calc_closest_station(newCenter);
+                var content_info = "<h1>Current Location</h1>" +
+                        "<h4>The closest_station is " +
+                        Stations[closest_station.index].name +
+                        "</h4><h4>It is " + closest_station.distance/1609.344 +
+                        " miles away.</h4>";
+                        person.addListener('click', function(){
+                                var infowindow = new google.maps.InfoWindow({
+                                        content: content_info
+                                });
+                                infowindow.open(map,person);
+                        });
+                        var to_nearest = new google.maps.Polyline({
+                                path: [newCenter, {lat:Stations[closest_station.index].lat,lng:Stations[closest_station.index].lng}],
+                                geodesic: true,
+                                strokeColor: 'red',
+                                strokeOpacity: 1.0,
+                                strokeWeight: 2
+                        });
+                        to_nearest.setMap(map);
+                        map.panTo(newCenter);
+                });
+}
 
 function calc_closest_station(pos){
         var Alewife = new google.maps.LatLng(Stations[0].lat,Stations[0].lng);
@@ -99,24 +134,28 @@ function calc_closest_station(pos){
         return closest_station;
 }
 
-var data;
-var previous_time = undefined;
-function changeMarkerData(station, infowindow){
-        var cur_time = new Date();
-        if (previous_time == undefined){
-                get_data();
-        }
-        // updates every click if previous click was over a min ago
-        else if(previous_time - cur_time >= 60000){
-                get_data();
-        }
-        previous_time = cur_time;
-
-}
-
-function get_data(){
-
-}
+var data = {"place-alfcl": {data:undefined, last_update:undefined},
+            "place-davis": {data:undefined, last_update:undefined},
+            "place-porter":{data:undefined, last_update:undefined},
+            "place-harsq": {data:undefined, last_update:undefined},
+            "place-cntsq": {data:undefined, last_update:undefined},
+            "place-knncl": {data:undefined, last_update:undefined},
+            "place-chmnl": {data:undefined, last_update:undefined},
+            "place-pktrm": {data:undefined, last_update:undefined},
+            "place-dwnxg": {data:undefined, last_update:undefined},
+            "place-sstat": {data:undefined, last_update:undefined},
+            "place-brdwy": {data:undefined, last_update:undefined},
+            "place-andrw": {data:undefined, last_update:undefined},
+            "place-jfk":   {data:undefined, last_update:undefined},
+            "place-nqncy": {data:undefined, last_update:undefined},
+            "place-wlsta": {data:undefined, last_update:undefined},
+            "place-qnctr": {data:undefined, last_update:undefined},
+            "place-qamnl": {data:undefined, last_update:undefined},
+            "place-brntn": {data:undefined, last_update:undefined},
+            "place-shmnl": {data:undefined, last_update:undefined},
+            "place-fldcr": {data:undefined, last_update:undefined},
+            "place-smmnl": {data:undefined, last_update:undefined},
+            "place-asmnl": {data:undefined, last_update:undefined}};
 
 var Stations = [
         {name:"Alewife",          lat:  42.395428,  lng: -71.142483,        id:"place-alfcl"},
