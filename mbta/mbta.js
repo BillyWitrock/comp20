@@ -119,7 +119,6 @@ function get_data(station,infowindow){
         request.onreadystatechange = function(){
                 //want to parse data, update data object.
                 if (request.readyState == 4 && request.status == 200){
-                        console.log(request.responseText);
                         cur_data = JSON.parse(request.responseText);
                         data[station.id] = {data:cur_data, last_update:new Date()};
                         update_infowindow(station,infowindow);
