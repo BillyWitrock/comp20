@@ -5,10 +5,29 @@
 <head>
     <meta charset="utf-8" />
     <title>Captain's Log</title>
-    <link rel="stylesheet" href="style.css" />
+    <!-- <link rel="stylesheet" href="style.css" /> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>
-        // Your work will be done here...
+        $(document).ready(function (){
+                $('#msg').keypress(function (event) {
+                        if (event.KeyCode ? event.keyCode : event.which == '13'){
+                                var input = $('#msg').val();
+                                var date = new Date();
+                                var value = date.toString() + " - " + input;
+                                localStorage.setItem(date, value);
+                                $('#msg').val('');
+                                set_log();
+                        }
+                });
+        });
+        function set_log() {
+                $('#log').html("");
+                for (var key in localStorage){
+                        if (key == "length"){return;}
+                        $('#log').append("<p>"+ localStorage[key] +"</p>");
+                }
+        }
+
     </script>
 </head>
 
