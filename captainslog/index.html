@@ -22,9 +22,15 @@
         });
         function set_log() {
                 $('#log').html("");
+                var keys = [];
                 for (var key in localStorage){
-                        if (key == "length"){return;}
-                        $('#log').append("<p>"+ localStorage[key] +"</p>");
+                        var possible_date = new Date(key);
+                        if (possible_date == "Invalid Date"){ continue;}
+                        keys.push(possible_date);
+                }
+                keys.sort();
+                for (var i in keys){
+                        $('#log').append("<p>"+ localStorage[keys[i]] +"</p>");
                 }
         }
 
