@@ -1,5 +1,5 @@
 # README
-## Billy Witrock's Private GitHub repository
+#### Billy Witrock's Private GitHub repository
 
 1. The purpose of this Git repository is first to submit work easily and second to keep track of version control.
 
