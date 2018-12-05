@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Assignment 4</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        function hack(){
+            $.get("https://safe-falls-38386.herokuapp.com/scores.json?username[$ne]=wantall", function(data){
+                alert(data);
+            });
+        }
+
+    </script>
+
+</head>
+
+<body>
+    <h1>Tufts Comp20: Assignment 4</h1>
+    <p>By: Billy Witrock</p>
+    <h2>Introduction</h2>
+    <p>My job is to find sercurity issues in my partner's 2048 Game server.<p>
+    <h2>Methodology</h2>
+    <p>My methodology is to look at each path my partner's server has and to one at a time look for a way to attat it. All of my attacts were done using curl in the commmand line or using google chrome.</p>
+
+    <h2>Issues Found</h2>
+    <ul><li><h3>Database Injection</h3>
+                <ul><li>Location of the problem was in the GET "/scores.json" method.</li>
+                <li>The severity of the issue in my opinion is medium. I beleive it is a high risk problem in general, however, when it comes to this application the data is not super sensitive.</li>
+               <li>Description of the issue: I found this issue by first looking at the homepage where the top ten scores are displayed. There I noticed that none of the highscores had a username of "hello". So I then tried to access all data with a username not equal to "hello", which gave me back all the data.</li>
+               <li>Proof: <img src="database_injection.JPG" alt="Proof of Database injection"></li>
+               <li>Resolution: A resolution to the problem would be to strip all specail charaters before using the input given in the database. This would take out the "[]" so the command would not work.</li></ul>
+               </li>
+
+              <li><h3>XSS (Cross-site Scripting)</h3>
+              <ul><li>Location of the problem was in the POST "/submit" method</li><li>The severity of this problem is high. I believe this is a major problem because even though I only had the browser make an alert, you could exicute any Javascript.</li>
+              <li>I found the issue by looking at the code for the server and noticing that they trusted. As soon as I saw that I knew I would be able to put specail charaters such as "<" and ">" which allow me to add script tags.</li>
+            <li>Proof: <img src="XSS.JPG" alt="Proff of cross site scripting"></li><li>To fix this problem the server shouldn't trust user input and therefore should strip out all specail charaters so script tags can not be added.</li></ul></li>
+            <li><h3>Access-Conrol-Allow-Origin: * error</h3>
+                <ul><li>The location of this problem is in every method he has.</li>
+                    <li>This could be a very bad issue, it allows anyone from any website to attempt to access this data.</li>
+                    <li>I found this problem by looking at my partner's code, and seeing the lines at which he sets this up.</li>
+                    <li>An example will be this website. Clicking the following will submit a GET request to get all the data from the database (I am using injection as well). The data will be displayed in JSON form. <input type="submit" onclick="hack()" value="click me"></li>
+                    <li>My suggestion to fix it is to change the wildcard to only the website(s) you want to access each command. In the case of the 2048 game server, only the 2048 game should be able to add, and view scores.</li>
+                </ul>
+            </ul>
+        <h2>Conclusion</h2>
+        <p>My Conclusion is that this website can easily be hacked. I believe since it is weak to XSS, injection, and CORS errors, it is an overall weak website. The main problem it has is that it trusts all user input. If the server chose not to trust any user input, many of it's problems will be eliminated</p>
+        <h2>Reference</h2>
+        <ul><li>Piazza</li><li>developer.mozilla.org</li><li>owasp.org top ten list</li></ul>
+
+</body>
+</html>
